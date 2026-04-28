@@ -3,7 +3,7 @@ import {type ProductDocumentType, type ProductDocument} from '@data/types/produc
 import {BOViewOrderBasePageInterface} from '@interfaces/BO/orders/view/viewOrderBasePage';
 import {type Frame, type Page} from '@playwright/test';
 
-export interface BOProductBlockTabListPageInterface extends BOViewOrderBasePageInterface {
+export interface BOOrdersViewBlockTabListPageInterface extends BOViewOrderBasePageInterface {
   readonly alertTextInSplitModal: string;
   readonly alertTextInMergeModal: string;
 
@@ -24,7 +24,8 @@ export interface BOProductBlockTabListPageInterface extends BOViewOrderBasePageI
   countDocumentsType(page: Page): Promise<{creditSlips: number, deliverySlips: number, invoices: number}>;
   downloadDeliverySlip(page: Page): Promise<string | null>;
   downloadInvoice(page: Page, row?: number): Promise<string | null>;
-  editShipment(page: Page, carrier: string): Promise<boolean>;
+  editCarrier(page: Page, carrier: string): Promise<boolean>;
+  editShipment(page: Page, trackingNumber: string, carrier: string): Promise<boolean>;
   generateInvoice(page: Page): Promise<string>;
   getAlertTextFromMergeModal(page: Page): Promise<string>;
   getAlertTextFromSplitModal(page:Page):Promise<string>;

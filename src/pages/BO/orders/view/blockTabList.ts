@@ -1,7 +1,7 @@
-import type {BOProductBlockTabListPageInterface} from '@interfaces/BO/orders/view/blockTabList';
+import type {BOOrdersViewBlockTabListPageInterface} from '@interfaces/BO/orders/view/blockTabList';
 
 /* eslint-disable global-require, @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires */
-function requirePage(): BOProductBlockTabListPageInterface {
+function requirePage(): BOOrdersViewBlockTabListPageInterface {
   return require('@versions/develop/pages/BO/orders/view/blockTabList');
 }
 /* eslint-enable global-require, @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires */
