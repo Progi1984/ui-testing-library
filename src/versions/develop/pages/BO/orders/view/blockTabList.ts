@@ -1,6 +1,6 @@
 import type FakerOrderShipping from '@data/faker/orderShipping';
 import {ProductDocumentType, type ProductDocument} from '@data/types/product';
-import {type BOProductBlockTabListPageInterface} from '@interfaces/BO/orders/view/blockTabList';
+import {type BOOrdersViewBlockTabListPageInterface} from '@interfaces/BO/orders/view/blockTabList';
 import {type Frame, type Page} from '@playwright/test';
 import {ViewOrderBasePage} from '@versions/develop/pages/BO/orders/view/viewOrderBasePage';
 
@@ -9,7 +9,7 @@ import {ViewOrderBasePage} from '@versions/develop/pages/BO/orders/view/viewOrde
  * @class
  * @extends ViewOrderBasePage
  */
-class BOProductBlockTabListPage extends ViewOrderBasePage implements BOProductBlockTabListPageInterface {
+class BOOrdersViewBlockTabListPage extends ViewOrderBasePage implements BOOrdersViewBlockTabListPageInterface {
   public readonly alertTextInSplitModal: string;
 
   public readonly alertTextInMergeModal: string;
@@ -150,6 +150,8 @@ class BOProductBlockTabListPage extends ViewOrderBasePage implements BOProductBl
 
   private readonly editShipmentSubmitButton: string;
 
+  private readonly editShipmentTrackingNumberInput: string;
+
   private readonly editShipmentCarrierSelect: string;
 
   private readonly fulfillShipmentTrackingNumberInput: string;
@@ -267,7 +269,8 @@ class BOProductBlockTabListPage extends ViewOrderBasePage implements BOProductBl
     this.shipmentsTab = '#orderShipmentsTab';
     this.shipmentTableRow = (row: number) => `#shipment_grid_table tr:nth-child(${row})`;
     this.shipmentTableActionColumn = (row: number) => `${this.shipmentTableRow(row)} td.column-actions`;
-    this.shipmentTableDropdownLink = (row: number) => `${this.shipmentTableActionColumn(row)} a.dropdown-toggle`;
+    this.shipmentTableDropdownLink = (row: number) => `${this.shipmentTableActionColumn(row)} a.dropdown-toggle,`
+      + `${this.shipmentTableActionColumn(row)} div.dropdown`;
     this.shipmentMergeButton = (row: number) => `${this.shipmentTableActionColumn(row)} a[data-target="#mergeShipmentModal"]`;
     this.fulfillShipmentButton = (row: number) => `${this.shipmentTableActionColumn(row)} a[data-target="#fulfillShipmentModal"]`;
     this.editShipmentLink = (row: number) => `${this.shipmentTableActionColumn(row)} a[data-target="#editShipmentModal"]`;
@@ -284,6 +287,7 @@ class BOProductBlockTabListPage extends ViewOrderBasePage implements BOProductBl
     this.mergeShipmentProductCheckbox = (row: number) => `table.shipment-form__table tr:nth-child(${row})`
       + ' input[id*="merge_shipment_product"]';
     this.mergeShipmentCarrierSelect = '#merge_shipment_merge_to_shipment';
+    this.editShipmentTrackingNumberInput = '#edit_shipment_tracking_number';
     this.mergeShipmentSubmitButton = 'button[id*="submitMergeShipment"]';
     this.mergeShipmentModal = '#mergeShipmentModal';
     this.mergeShipmentWarningMessage = '#merge_shipment div.alert-warning p.alert-text';
@@ -1074,7 +1078,21 @@ class BOProductBlockTabListPage extends ViewOrderBasePage implements BOProductBl
    * @param carrier {string} Carrier name to set in the input
    * @returns {Promise<boolean>}
    */
-  async editShipment(page: Page, carrier: string): Promise<boolean> {
+  async editShipment(page: Page, trackingNumber: string, carrier: string): Promise<boolean> {
+    await page.locator(this.editShipmentTrackingNumberInput).fill(trackingNumber);
+    await page.locator(this.editShipmentCarrierSelect).selectOption({label: carrier});
+    await page.locator(this.editShipmentSubmitButton).click();
+
+    return this.elementNotVisible(page, this.editShipmentModal, 2000);
+  }
+
+  /**
+   * Edit carrier
+   * @param page {Page} Browser tab
+   * @param carrier {string} Carrier name to set in the input
+   * @returns {Promise<boolean>}
+   */
+  async editCarrier(page: Page, carrier: string): Promise<boolean> {
     await page.locator(this.editShipmentCarrierSelect).selectOption({label: carrier});
     await page.locator(this.editShipmentSubmitButton).click();
 
@@ -1187,4 +1205,4 @@ class BOProductBlockTabListPage extends ViewOrderBasePage implements BOProductBl
   }
 }
 
-module.exports = new BOProductBlockTabListPage();
+module.exports = new BOOrdersViewBlockTabListPage();
