@@ -38,7 +38,6 @@ class BOWallOfFamePage extends BOBasePage implements BOWallOfFamePageInterface {
    */
   async goToWallOfFamePage(page: Page): Promise<void> {
     await this.goToSubMenu(page, '', this.wallOfFameLink);
-    await this.closeSfToolBar(page);
   }
 
   /**
