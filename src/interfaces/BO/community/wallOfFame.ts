@@ -4,5 +4,4 @@ import {type Page} from '@playwright/test';
 export interface BOWallOfFamePageInterface extends BOBasePagePageInterface {
   readonly pageTitle: string;
   getContributionPercentage(page: Page, contributor: 'PrestaShop' | 'Community'): Promise<number>;
-  goToWallOfFamePage(page: Page): Promise<void>;
 }

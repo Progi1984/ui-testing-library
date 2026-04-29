@@ -1,4 +1,4 @@
-import {type BOWallOfFamePageInterface} from '@interfaces/BO/community/wallOfFame';
+goToSubMenuimport {type BOWallOfFamePageInterface} from '@interfaces/BO/community/wallOfFame';
 import BOBasePage from '@pages/BO/BOBasePage';
 import {type Page} from '@playwright/test';
 
@@ -29,15 +29,6 @@ class BOWallOfFamePage extends BOBasePage implements BOWallOfFamePageInterface {
     this.kpisItem = '.wof-header-section__kpis-item';
     this.kpisValue = '.wof-header-section__kpis-value';
     this.kpisLabel = '.wof-header-section__kpis-label';
-  }
-
-  /**
-   * Go to Wall of Fame page via the main menu (COMMUNITY section)
-   * @param page {Page} Browser tab
-   * @returns {Promise<void>}
-   */
-  async goToWallOfFamePage(page: Page): Promise<void> {
-    await this.goToSubMenu(page, '', this.wallOfFameLink);
   }
 
   /**
