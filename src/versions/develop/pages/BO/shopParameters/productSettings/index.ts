@@ -151,6 +151,27 @@ class BOProductSettingsPage extends BOBasePage implements BOProductSettingsPageI
   }
 
   /**
+   * Get the value of an input
+   * @override
+   * @param page {Page} Browser tab
+   * @param input {string} ID of the input
+   * @returns {Promise<string>}
+   */
+  async getValue(page: Page, input: string): Promise<string> {
+    let inputSelector: string;
+
+    switch (input) {
+      case 'PS_NB_DAYS_NEW_PRODUCT':
+        inputSelector = this.newDaysNumberInput;
+        break;
+      default:
+        throw new Error(`Field ${input} was not found`);
+    }
+
+    return this.getInputValue(page, inputSelector);
+  }
+
+  /**
    * Enable/disable show prices
    * @param page {Page} Browser tab
    * @param toEnable {boolean} True if we need to enable show prices status
