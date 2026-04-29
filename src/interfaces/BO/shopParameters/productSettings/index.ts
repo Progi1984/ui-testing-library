@@ -6,6 +6,7 @@ export interface BOProductSettingsPageInterface extends BOBasePagePageInterface 
 
     changeCatalogModeStatus(page: Page, toEnable?: boolean): Promise<string>;
     chooseQuantityDiscountsBasedOn(page: Page, basedOn: string): Promise<string>;
+    getValue(page: Page, input: string, languageId?: number): Promise<string>;
     isDisplayNotificationIfProductInCartChecked(page: Page): Promise<boolean>;
     setAllowOrderingOutOfStockStatus(page: Page, toEnable?: boolean): Promise<string>;
     setDefaultActivationStatus(page: Page, toEnable?: boolean): Promise<string>;
