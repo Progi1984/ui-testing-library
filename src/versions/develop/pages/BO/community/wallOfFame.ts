@@ -1,4 +1,4 @@
-goToSubMenuimport {type BOWallOfFamePageInterface} from '@interfaces/BO/community/wallOfFame';
+import {type BOWallOfFamePageInterface} from '@interfaces/BO/community/wallOfFame';
 import BOBasePage from '@pages/BO/BOBasePage';
 import {type Page} from '@playwright/test';
 
