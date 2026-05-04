@@ -8,6 +8,7 @@
     "skipDefaultLibCheck": true,
     "skipLibCheck": true,
     "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
     "noImplicitAny": true,
     "noImplicitThis": false,
     "strict": true,
@@ -19,30 +20,29 @@
       "dom.iterable",
       "esnext"
     ],
-    "baseUrl": "./",
     "rootDir": "src",
     "outDir": "./dist",
     "paths": {
       "@interfaces/*": [
-        "src/interfaces/*"
+        "./src/interfaces/*"
       ],
       "@pages/*": [
-        "src/pages/*"
+        "./src/pages/*"
       ],
       "@data/*": [
-        "src/data/*"
+        "./src/data/*"
       ],
       "@ops/*": [
-        "src/ops/*"
+        "./src/ops/*"
       ],
       "@types/*": [
-        "src/types/*"
+        "./src/types/*"
       ],
       "@utils/*": [
-        "src/utils/*"
+        "./src/utils/*"
       ],
       "@versions/*": [
-        "src/versions/*"
+        "./src/versions/*"
       ]
     },
     "typeRoots": [
