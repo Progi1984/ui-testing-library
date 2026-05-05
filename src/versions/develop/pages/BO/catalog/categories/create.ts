@@ -193,8 +193,14 @@ class BOCategoriesCreatePage extends BOBasePage implements BOCategoriesCreatePag
    * Return input value
    * @param page {Page}
    * @param inputName {string}
+   * @param language {string}
    */
-  async getValue(page: Page, inputName: string): Promise<string> {
+  async getValue(page: Page, inputName: string, language: string = 'en'): Promise<string> {
+    if (language === 'fr' && await this.elementVisible(page, this.nameInputEn)) {
+      await page.locator(this.nameLanguageDropDown).click();
+      await page.locator(this.nameLanguageButtonFr).click();
+    }
+
     switch (inputName) {
       case 'friendlyUrl':
         return page.inputValue(this.linkRewriteInputEn);
@@ -203,42 +209,27 @@ class BOCategoriesCreatePage extends BOBasePage implements BOCategoriesCreatePag
           return this.getAttributeContent(page, this.categoryCoverImageImg, 'src');
         }
         return '';
-      case 'nameEn':
-        return page.inputValue(this.nameInputEn);
-      case 'descriptionEn':
-        return this.getValueOnTinymceInput(page, this.descriptionIframeEn);
-      case 'metaTitleEn':
-        return page.inputValue(this.metaTitleInputEn);
-      case 'metaDescriptionEn':
-        return page.inputValue(this.metaDescriptionTextareaEn);
+      case 'name':
+        return page.inputValue(
+          language === 'fr' ? this.nameInputFr : this.nameInputEn,
+        );
+      case 'description':
+        return this.getValueOnTinymceInput(
+          page,
+          language === 'fr' ? this.descriptionIframeFR : this.descriptionIframeEn,
+        );
+      case 'metaTitle':
+        return page.inputValue(
+          language === 'fr' ? this.metaTitleInputFr : this.metaTitleInputEn,
+        );
+      case 'metaDescription':
+        return page.inputValue(
+          language === 'fr'
+            ? this.metaDescriptionTextareaFr
+            : this.metaDescriptionTextareaEn,
+        );
       case 'active':
-        return ((await page.isChecked(this.displayedToggleInput(0))) ? '0' : '1');
-      default:
-        throw new Error(`Input ${inputName} was not found`);
-    }
-  }
-
-  /**
-   * Get FR value
-   * @param page {Page}
-   * @param inputName {string}
-   */
-  async getFrValue(page: Page, inputName: string): Promise<string> {
-    if (await this.elementVisible(page, this.nameInputEn)) {
-      await page.locator(this.nameLanguageDropDown).click();
-      await page.locator(this.nameLanguageButtonFr).click();
-    }
-    switch (inputName) {
-      case 'nameFr':
-        return page.inputValue(this.nameInputFr);
-      case 'descriptionFr':
-        return this.getValueOnTinymceInput(page, this.descriptionIframeFR);
-      case 'metaTitleFr':
-        return page.inputValue(this.metaTitleInputFr);
-      case 'metaDescriptionFr':
-        return page.inputValue(this.metaDescriptionTextareaFr);
-      case 'friendlyUrl':
-        return page.inputValue(this.linkRewriteInputEn);
+        return (await page.isChecked(this.displayedToggleInput(0))) ? '0' : '1';
       default:
         throw new Error(`Input ${inputName} was not found`);
     }
