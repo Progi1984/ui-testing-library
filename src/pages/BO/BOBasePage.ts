@@ -1054,6 +1054,29 @@ export default class BOBasePage extends CommonPage implements BOBasePagePageInte
   }
 
   /**
+   * Get value from tinyMce textarea
+   * @param page {Page} Browser tab
+   * @param iFrameSelector {string} Selector of the iFrame to get value from
+   * @param hasParagraph {boolean} Has the iFrame a paragraph
+   * @return {Promise<string>}
+   */
+  async getValueOnTinymceInput(page: Page, iFrameSelector: string, hasParagraph: boolean = true): Promise<string> {
+    const args = {selector: iFrameSelector, hasP: hasParagraph};
+    await page.waitForSelector(iFrameSelector);
+    // eslint-disable-next-line no-eval
+    const fn: { fnGetValueOnTinymceInput: PageFunction<{ selector: string, hasP: boolean }, string> } = eval(`({
+    async fnGetValueOnTinymceInput(args) {
+      /* eslint-env browser */
+      const iFrameElement = await document.querySelector(args.selector);
+      const iFrameHtml = iFrameElement.contentDocument.documentElement;
+      const textElement = await iFrameHtml.querySelector(args.hasP ? 'body p' : 'body');
+      return textElement.textContent;
+    }})`);
+
+    return page.evaluate(fn.fnGetValueOnTinymceInput, args);
+  }
+
+  /**
    * Set value on tinyMce textarea
    * @param frameLocator {FrameLocator} TinyMCE iFrame
    * @param value {string} Value to set on the iFrame

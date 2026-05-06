@@ -10,11 +10,19 @@ class BOCategoriesCreatePage extends BOBasePage implements BOCategoriesCreatePag
 
   private readonly formCategory: string;
 
-  private readonly nameInput: string;
+  private readonly nameInputEn: string;
+
+  private readonly nameLanguageDropDown: string;
+
+  private readonly nameLanguageButtonFr: string;
+
+  private readonly nameInputFr: string;
 
   private readonly displayedToggleInput: (toggle: number) => string;
 
-  private readonly descriptionIframe: string;
+  private readonly descriptionIframeEn: string;
+
+  private readonly descriptionIframeFR: string;
 
   private readonly categoryCoverImage: string;
 
@@ -22,11 +30,15 @@ class BOCategoriesCreatePage extends BOBasePage implements BOCategoriesCreatePag
 
   private readonly categoryThumbnailImage: string;
 
-  private readonly metaTitleInput: string;
+  private readonly metaTitleInputEn: string;
 
-  private readonly metaDescriptionTextarea: string;
+  private readonly metaTitleInputFr: string;
 
-  private readonly linkRewriteInput: string;
+  private readonly metaDescriptionTextareaEn: string;
+
+  private readonly metaDescriptionTextareaFr: string;
+
+  private readonly linkRewriteInputEn: string;
 
   private readonly redirectionWhenNotDisplayedSelect: string;
 
@@ -56,15 +68,21 @@ class BOCategoriesCreatePage extends BOBasePage implements BOCategoriesCreatePag
 
     // Selectors
     this.formCategory = '#main-div .content-div form';
-    this.nameInput = '#category_name_1';
+    this.nameInputEn = '#category_name_1';
+    this.nameInputFr = '#category_name_2';
+    this.nameLanguageDropDown = '#category_name_dropdown';
+    this.nameLanguageButtonFr = 'div.locale-dropdown-menu.show span[data-locale="fr"]';
     this.displayedToggleInput = (toggle: number) => `#category_active_${toggle}`;
-    this.descriptionIframe = '#category_description_1_ifr';
+    this.descriptionIframeEn = '#category_description_1_ifr';
+    this.descriptionIframeFR = '#category_description_2_ifr';
     this.categoryCoverImage = '#category_cover_image';
     this.categoryCoverImageImg = 'label[for="category_cover_image"] + div.input-container figure img';
     this.categoryThumbnailImage = '#category_thumbnail_image';
-    this.metaTitleInput = '#category_meta_title_1';
-    this.metaDescriptionTextarea = '#category_meta_description_1';
-    this.linkRewriteInput = '#category_link_rewrite_1';
+    this.metaTitleInputEn = '#category_meta_title_1';
+    this.metaTitleInputFr = '#category_meta_title_2';
+    this.metaDescriptionTextareaEn = '#category_meta_description_1';
+    this.metaDescriptionTextareaFr = '#category_meta_description_2';
+    this.linkRewriteInputEn = '#category_link_rewrite_1';
     this.redirectionWhenNotDisplayedSelect = '#category_redirect_option_type';
     this.redirectedCategory = '#category_redirect_option_target_search_input';
     this.selectAllGroupAccessCheckbox = '.js-choice-table-select-all';
@@ -113,17 +131,17 @@ class BOCategoriesCreatePage extends BOBasePage implements BOCategoriesCreatePag
    * @returns {Promise<string>}
    */
   async createEditCategory(page: Page, categoryData: FakerCategory): Promise<string> {
-    await this.setValue(page, this.nameInput, categoryData.name);
+    await this.setValue(page, this.nameInputEn, categoryData.name);
     await this.setChecked(page, this.displayedToggleInput(categoryData.displayed ? 1 : 0));
-    await this.setValueOnTinymceInput(page, this.descriptionIframe, categoryData.description);
+    await this.setValueOnTinymceInput(page, this.descriptionIframeEn, categoryData.description);
     if (categoryData.coverImage) {
       await this.uploadFile(page, this.categoryCoverImage, categoryData.coverImage);
     }
     if (categoryData.thumbnailImage) {
       await this.uploadFile(page, this.categoryThumbnailImage, categoryData.thumbnailImage);
     }
-    await this.setValue(page, this.metaTitleInput, categoryData.metaTitle);
-    await this.setValue(page, this.metaDescriptionTextarea, categoryData.metaDescription);
+    await this.setValue(page, this.metaTitleInputEn, categoryData.metaTitle);
+    await this.setValue(page, this.metaDescriptionTextareaEn, categoryData.metaDescription);
     await page.locator(this.redirectionWhenNotDisplayedSelect).selectOption({
       value: categoryData.redirectionWhenNotDisplayed,
     });
@@ -175,16 +193,43 @@ class BOCategoriesCreatePage extends BOBasePage implements BOCategoriesCreatePag
    * Return input value
    * @param page {Page}
    * @param inputName {string}
+   * @param language {string}
    */
-  async getValue(page: Page, inputName: string): Promise<string> {
+  async getValue(page: Page, inputName: string, language: string = 'en'): Promise<string> {
+    if (language === 'fr' && await this.elementVisible(page, this.nameInputEn)) {
+      await page.locator(this.nameLanguageDropDown).click();
+      await page.locator(this.nameLanguageButtonFr).click();
+    }
+
     switch (inputName) {
       case 'friendlyUrl':
-        return page.inputValue(this.linkRewriteInput);
+        return page.inputValue(this.linkRewriteInputEn);
       case 'cover_image':
         if (!(await this.elementNotVisible(page, this.categoryCoverImageImg, 3000))) {
           return this.getAttributeContent(page, this.categoryCoverImageImg, 'src');
         }
         return '';
+      case 'name':
+        return page.inputValue(
+          language === 'fr' ? this.nameInputFr : this.nameInputEn,
+        );
+      case 'description':
+        return this.getValueOnTinymceInput(
+          page,
+          language === 'fr' ? this.descriptionIframeFR : this.descriptionIframeEn,
+        );
+      case 'metaTitle':
+        return page.inputValue(
+          language === 'fr' ? this.metaTitleInputFr : this.metaTitleInputEn,
+        );
+      case 'metaDescription':
+        return page.inputValue(
+          language === 'fr'
+            ? this.metaDescriptionTextareaFr
+            : this.metaDescriptionTextareaEn,
+        );
+      case 'active':
+        return (await page.isChecked(this.displayedToggleInput(0))) ? '0' : '1';
       default:
         throw new Error(`Input ${inputName} was not found`);
     }

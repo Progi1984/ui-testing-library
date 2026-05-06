@@ -106,6 +106,7 @@ export interface BOBasePagePageInterface extends CommonPageInterface {
   getShopColor(page: Page): Promise<string>;
   getShopName(page: Page): Promise<string>;
   getShopVersion(page:Page):Promise<string>;
+  getValueOnTinymceInput(page: Page, iFrameSelector: string, hasParagraph?: boolean): Promise<string>
   goToDashboardPage(page: Page): Promise<void>;
   goToManageQuickAccessPage(page: Page): Promise<void>;
   goToMyProfile(page: Page): Promise<void>;
