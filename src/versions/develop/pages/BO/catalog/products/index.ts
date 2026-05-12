@@ -911,6 +911,7 @@ class ProductsPage extends BOBasePage implements BOProductsPageInterface {
         return this.getProductFormattedPriceFromList(page, row, false);
       case 'priceTaxExcluded':
         return this.getProductPriceFromList(page, row, true);
+      case 'price':
       case 'priceTaxIncluded':
         return this.getProductPriceFromList(page, row, false);
       case 'quantity':
