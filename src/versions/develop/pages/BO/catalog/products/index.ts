@@ -849,8 +849,7 @@ class ProductsPage extends BOBasePage implements BOProductsPageInterface {
    * @returns {Promise<number>}
    */
   async getProductPriceFromList(page: Page, row: number, withTaxes: boolean): Promise<number> {
-    const selector = withTaxes ? this.productsListTableColumnPriceATI : this.productsListTableColumnPriceTExc;
-    const text = await this.getTextContent(page, selector(row));
+    const text = await this.getProductFormattedPriceFromList(page, row, withTaxes);
     const resultExecArray: RegExpExecArray | null = /[\d.]+/g.exec(text);
 
     if (resultExecArray === null) {
@@ -858,6 +857,19 @@ class ProductsPage extends BOBasePage implements BOProductsPageInterface {
     }
 
     return parseFloat(resultExecArray.toString());
+  }
+
+  /**
+   * Get Formatted Product Price
+   * @param page {Page} Browser tab
+   * @param row {number} Row on table
+   * @param withTaxes {boolean} True if we need to get product price with tax, false if not
+   * @returns {Promise<string>}
+   */
+  async getProductFormattedPriceFromList(page: Page, row: number, withTaxes: boolean): Promise<string> {
+    const selector = withTaxes ? this.productsListTableColumnPriceATI : this.productsListTableColumnPriceTExc;
+
+    return this.getTextContent(page, selector(row));
   }
 
   /**
@@ -893,7 +905,13 @@ class ProductsPage extends BOBasePage implements BOProductsPageInterface {
         return this.getTextContent(page, this.productsListTableColumnReference(row));
       case 'category':
         return this.getTextContent(page, this.productsListTableColumnCategory(row));
-      case 'price':
+      case 'formattedPriceTaxExcluded':
+        return this.getProductFormattedPriceFromList(page, row, true);
+      case 'formattedPriceTaxIncluded':
+        return this.getProductFormattedPriceFromList(page, row, false);
+      case 'priceTaxExcluded':
+        return this.getProductPriceFromList(page, row, true);
+      case 'priceTaxIncluded':
         return this.getProductPriceFromList(page, row, false);
       case 'quantity':
         return this.getNumberFromText(page, this.productsListTableColumnQuantity(row));

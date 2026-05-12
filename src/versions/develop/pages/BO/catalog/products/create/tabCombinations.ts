@@ -118,7 +118,19 @@ class CombinationsTab extends BOBasePage implements BOProductsCreateTabCombinati
 
   private readonly combinationsListTable: string;
 
-  private readonly combinationListTableRow: (row: number) => string;
+  private readonly combinationsListTableRows: string;
+
+  private readonly combinationsListTableRow: (row: number) => string;
+
+  private readonly combinationsListTableRowId: (row: number) => string;
+
+  private readonly combinationsListTableRowName: (row: number) => string;
+
+  private readonly combinationsListTableRowQuantity: (row: number) => string;
+
+  private readonly combinationsListTableRowPriceTaxExcluded: (row: number) => string;
+
+  private readonly combinationsListTableRowReference: (row: number) => string;
 
   private readonly combinationListTableColumn: (row: number, column: string) => string;
 
@@ -149,6 +161,12 @@ class CombinationsTab extends BOBasePage implements BOProductsCreateTabCombinati
   private readonly editCombinationModalImpactOnPriceTExcInput: string;
 
   private readonly editCombinationModalReferenceInput: string;
+
+  private readonly editCombinationModalFinalPriceTaxExcludedInput: string;
+
+  private readonly editCombinationModalFinalPriceTaxIncludedInput: string;
+
+  private readonly editCombinationModalLocationInput: string;
 
   private readonly editCombinationModalSaveButton: string;
 
@@ -278,7 +296,15 @@ class CombinationsTab extends BOBasePage implements BOProductsCreateTabCombinati
 
     // Selectors of combinations table
     this.combinationsListTable = '#combination_list';
-    this.combinationListTableRow = (row: number) => `#combination-list-row-${row - 1}`;
+    this.combinationsListTableRows = `${this.combinationsListTable} .combination-list-row`;
+    this.combinationsListTableRow = (row: number) => `${this.combinationsListTableRows}:nth-child(${row})`;
+    this.combinationsListTableRowId = (row: number) => `${this.combinationsListTableRow(row)} input[name$="[combination_id]"]`;
+    this.combinationsListTableRowName = (row: number) => `${this.combinationsListTableRow(row)} input[name$="[name]"]`;
+    this.combinationsListTableRowQuantity = (row: number) => `${this.combinationsListTableRow(row)} input`
+      + '[name$="[delta_quantity][initial_quantity]"]';
+    this.combinationsListTableRowPriceTaxExcluded = (row: number) => `${this.combinationsListTableRow(row)} input`
+      + '[name$="[final_price_te]"]';
+    this.combinationsListTableRowReference = (row: number) => `${this.combinationsListTableRow(row)} input[name$="[reference]"]`;
     this.combinationListTableColumn = (row: number, column: string) => `td input#combination_list_${row - 1}_${column}`;
     this.combinationListTableActionsDropDown = (row: number) => `#combination_list_${row - 1}_actions div a`;
     this.combinationListTableActionsColumn = (row: number, action: string) => `td button#combination_list_${row - 1}`
@@ -299,6 +325,9 @@ class CombinationsTab extends BOBasePage implements BOProductsCreateTabCombinati
     this.editCombinationModalMinimalQuantityInput = '#combination_form_stock_quantities_minimal_quantity';
     this.editCombinationModalImpactOnPriceTExcInput = '#combination_form_price_impact_price_tax_excluded';
     this.editCombinationModalReferenceInput = '#combination_form_references_reference';
+    this.editCombinationModalFinalPriceTaxExcludedInput = '#combination_form_price_impact_final_price_tax_excluded';
+    this.editCombinationModalFinalPriceTaxIncludedInput = '#combination_form_price_impact_final_price_tax_included';
+    this.editCombinationModalLocationInput = '#combination_form_stock_options_stock_location';
     this.editCombinationModalSaveButton = `${this.editCombinationModal} footer button.btn-primary`;
     this.editCombinationModalCloseButton = `${this.editCombinationModal} footer button.btn-close`;
     this.editCombinationCloseModal = `${this.editCombinationEditModal} div.modal-prevent-close div.modal.show`;
@@ -641,6 +670,25 @@ class CombinationsTab extends BOBasePage implements BOProductsCreateTabCombinati
     };
   }
 
+  async getCombinationModalValue(page: Page, inputName: string): Promise<string> {
+    const combinationFrame: Frame|null = page.frame({url: /sell\/catalog\/products\/combinations/gmi});
+
+    if (!combinationFrame) {
+      return '';
+    }
+
+    switch (inputName) {
+      case 'finalPriceTaxExcluded':
+        return combinationFrame.locator(this.editCombinationModalFinalPriceTaxExcludedInput).inputValue();
+      case 'finalPriceTaxIncluded':
+        return combinationFrame.locator(this.editCombinationModalFinalPriceTaxIncludedInput).inputValue();
+      case 'location':
+        return combinationFrame.locator(this.editCombinationModalLocationInput).inputValue();
+      default:
+        throw new Error(`Input ${inputName} was not found`);
+    }
+  }
+
   /**
    * Close edit combination modal
    * @param page {Page} Browser tab
@@ -805,6 +853,46 @@ class CombinationsTab extends BOBasePage implements BOProductsCreateTabCombinati
     }
 
     return parseInt(regexResult.toString(), 10);
+  }
+
+  /**
+   * Get number of combinations
+   * @param page {Page} Browser tab
+   * @returns {Promise<number>}
+   */
+  async countCombinations(page: Page): Promise<number> {
+    return page.locator(this.combinationsListTableRows).count();
+  }
+
+  /**
+   *
+   * @param page {Page} Browser tab
+   * @param nth {number}
+   * @returns Promise<{
+    id: number,
+    attribute: string,
+    priceTaxExcluded: number,
+    stock: string,
+    formattedPrice: string,
+    reference: string,
+  }>
+   */
+  async getCombinationNth(page: Page, nth: number): Promise<{
+    id: number,
+    attribute: string,
+    priceTaxExcluded: number,
+    stock: string,
+    formattedPrice: string,
+    reference: string,
+  }> {
+    return {
+      id: parseInt(await page.locator(this.combinationsListTableRowId(nth)).inputValue(), 10),
+      attribute: await page.locator(this.combinationsListTableRowName(nth)).inputValue(),
+      priceTaxExcluded: parseFloat(await page.locator(this.combinationsListTableRowPriceTaxExcluded(nth)).inputValue()),
+      stock: await page.locator(this.combinationsListTableRowQuantity(nth)).inputValue(),
+      formattedPrice: await page.locator(this.combinationsListTableRowPriceTaxExcluded(nth)).inputValue(),
+      reference: await page.locator(this.combinationsListTableRowReference(nth)).inputValue(),
+    };
   }
 
   /**

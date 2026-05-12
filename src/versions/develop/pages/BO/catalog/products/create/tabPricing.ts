@@ -428,6 +428,10 @@ class PricingTab extends BOBasePage implements BOProductsCreateTabPricingPageInt
         return this.getAttributeContent(page, this.ecotaxInput, 'value');
       case 'id_tax_rules_group':
         return page.locator(this.taxRuleSelect).evaluate((node: HTMLSelectElement) => node.value);
+      case 'id_tax_rules_group-rate':
+        return page
+          .locator(`${this.taxRuleSelect} option[selected]`)
+          .evaluate((node: HTMLSelectElement) => (node.getAttribute('data-tax-rate') ?? ''));
       case 'on_sale':
         return (await this.isChecked(page, this.onSaleCheckbox)) ? '1' : '0';
       case 'price':
