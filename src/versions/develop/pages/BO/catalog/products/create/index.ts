@@ -214,7 +214,7 @@ class BOProductsCreatePage extends BOBasePage implements BOProductsCreatePageInt
     page: Page,
     tabName: 'combinations' | 'description' | 'details' | 'options' | 'pricing' | 'seo' | 'shipping' | 'stock',
   ): Promise<void> {
-    await this.waitForSelectorAndClick(page, this.tabLink(tabName));
+    await this.waitForSelectorAndClick(page, this.tabLink(tabName), 10000);
     await this.waitForVisibleSelector(page, `${this.tabLink(tabName)} a.active`, 2000);
   }
 

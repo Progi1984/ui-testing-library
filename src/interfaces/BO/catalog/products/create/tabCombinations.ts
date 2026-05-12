@@ -33,6 +33,7 @@ export interface BOProductsCreateTabCombinationsPageInterface extends BOBasePage
   clickOnNextCombinationButton(page: Page): Promise<void>;
   clickOnPreviousCombinationButton(page: Page): Promise<void>;
   closeEditCombinationModal(page: Page): Promise<boolean>;
+  countCombinations(page: Page): Promise<number>;
   editCombination(page: Page, combinationData: ProductCombinationOptions, row?: number): Promise<string | null>;
   editCombinationFromModal(page: Page, combinationData: ProductCombinationOptions): Promise<string>;
   editCombinationRowQuantity(page: Page, row: number, quantity: number): Promise<void>;
@@ -41,6 +42,15 @@ export interface BOProductsCreateTabCombinationsPageInterface extends BOBasePage
   generateCombinationModalIsClosed(page: Page): Promise<boolean>;
   generateCombinations(page: Page): Promise<string | null>;
   getAllRowsColumnContent(page: Page, numberOfCombinations: number, column: string): Promise<string[]>;
+  getCombinationModalValue(page: Page, inputName: string): Promise<string>
+  getCombinationNth(page: Page, nth: number): Promise<{
+    id: number,
+    attribute: string,
+    priceTaxExcluded: number,
+    stock: string,
+    formattedPrice: string,
+    reference: string,
+  }>;
   getCombinationNameFromModal(page: Page): Promise<string>;
   getFilterBySizeButtonName(page: Page): Promise<string>;
   getNumberOfCombinationsFromList(page: Page): Promise<number>;

@@ -136,6 +136,7 @@ type ProductCombinationBulkStock = {
 };
 
 type ProductCustomization = {
+  id?: number
   label: string
   type: string
   required: boolean

@@ -42,6 +42,8 @@ class StocksTab extends BOBasePage implements BOProductsCreateTabStocksPageInter
 
   private readonly behaviourOutOfStockInput: (id: number) => string;
 
+  private readonly behaviourOutOfStockLabel: (id: number) => string;
+
   protected denyOrderRadioButton: string;
 
   protected allowOrderRadioButton: string;
@@ -84,10 +86,11 @@ class StocksTab extends BOBasePage implements BOProductsCreateTabStocksPageInter
       languageId}`;
     this.productAvailableDateInput = '#product_stock_availability_available_date';
     // When out of stock selectors
-    this.behaviourOutOfStockInput = (id: number) => `#product_stock_availability_out_of_stock_type_${id} +i`;
-    this.denyOrderRadioButton = this.behaviourOutOfStockInput(0);
-    this.allowOrderRadioButton = this.behaviourOutOfStockInput(1);
-    this.useDefaultBehaviourRadioButton = this.behaviourOutOfStockInput(2);
+    this.behaviourOutOfStockInput = (id: number) => `#product_stock_availability_out_of_stock_type_${id}`;
+    this.behaviourOutOfStockLabel = (id: number) => `${this.behaviourOutOfStockInput(id)} + i`;
+    this.denyOrderRadioButton = this.behaviourOutOfStockLabel(0);
+    this.allowOrderRadioButton = this.behaviourOutOfStockLabel(1);
+    this.useDefaultBehaviourRadioButton = this.behaviourOutOfStockLabel(2);
 
     // Stock movement table selectors
     this.stockMovementsDiv = '#product_stock_quantities_stock_movements';
@@ -184,6 +187,8 @@ class StocksTab extends BOBasePage implements BOProductsCreateTabStocksPageInter
         return this.getAttributeContent(page, this.productLabelAvailableLaterInput(languageId!), 'value');
       case 'available_now':
         return this.getAttributeContent(page, this.productLabelAvailableNowInput(languageId!), 'value');
+      case 'availability_out_of_stock':
+        return (await this.isChecked(page, this.behaviourOutOfStockInput(0))) ? '0' : '1';
       case 'low_stock_threshold':
         return this.getAttributeContent(page, this.productLowStockThresholdInput, 'value');
       case 'low_stock_threshold_enabled':

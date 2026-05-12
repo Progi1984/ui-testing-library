@@ -6,16 +6,16 @@ import {ProductFilterMinMax} from '@data/types/product';
 import type FakerProduct from '@data/faker/product';
 
 export interface BOProductsPageInterface extends BOBasePagePageInterface {
-     readonly alertDangerIDFilterValue: string;
-     readonly alertDangerPriceFilterValue: string;
-     readonly alertDangerQuantityFilterValue: string;
-     readonly modalCreateProduct: string;
-     readonly modalDialog: string;
-     readonly packOfProductsDescription: string;
-     readonly pageTitle: string;
-     readonly productWithCombinationsDescription: string;
-     readonly standardProductDescription: string;
-     readonly virtualProductDescription: string;
+    readonly alertDangerIDFilterValue: string;
+    readonly alertDangerPriceFilterValue: string;
+    readonly alertDangerQuantityFilterValue: string;
+    readonly modalCreateProduct: string;
+    readonly modalDialog: string;
+    readonly packOfProductsDescription: string;
+    readonly pageTitle: string;
+    readonly productWithCombinationsDescription: string;
+    readonly standardProductDescription: string;
+    readonly virtualProductDescription: string;
 
     bulkActionsProduct(page: Page, action: string): Promise<string>;
     bulkSelectProducts(page: Page, products?: FakerProduct[]): Promise<boolean>
@@ -43,6 +43,7 @@ export interface BOProductsPageInterface extends BOBasePagePageInterface {
     getNumberOfProductsFromList(page: Page): Promise<number>;
     getPaginationLabel(page: Page): Promise<string>;
     getProductDescription(page: Page): Promise<string>;
+    getProductFormattedPriceFromList(page: Page, row: number, withTaxes: boolean): Promise<string>;
     getProductPriceFromList(page: Page, row: number, withTaxes: boolean): Promise<number>;
     getProductShopsId(page: Page, row: number): Promise<number[]>;
     getProductStatusFromList(page: Page, row: number): Promise<boolean>;

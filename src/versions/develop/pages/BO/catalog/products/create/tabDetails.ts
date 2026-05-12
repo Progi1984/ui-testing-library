@@ -96,13 +96,17 @@ class DetailsTab extends BOBasePage implements BOProductsCreateTabDetailsPageInt
 
   private readonly displayCondition: (row: number) => string;
 
+  private readonly customizationIdentifierInput: (row: number) => string;
+
   private readonly customizationNameInput: (row: number) => string;
 
   private readonly customizationTypeSelect: (row: number) => string;
 
   private readonly deleteCustomizationIcon: (row: number) => string;
 
-  private readonly customizationRequiredButton: (row: number, toEnable: number) => string;
+  private readonly customizationRequiredButton: (row: number) => string;
+
+  private readonly customizationRequiredButtonStatus: (row: number, toEnable: number) => string;
 
   /**
      * @constructs
@@ -160,12 +164,16 @@ class DetailsTab extends BOBasePage implements BOProductsCreateTabDetailsPageInt
     // Customization section
     this.customizationRow = '#product_details_customizations_customization_fields .customization-field-row';
     this.addNewCustomizationButton = '#product_details_customizations_add_customization_field';
+    this.customizationIdentifierInput = (row: number) => `${this.customizationRow}:nth-child(${row}) input`
+      + '[name^="product[details][customizations][customization_fields]"][name$="[id]"]';
     this.customizationNameInput = (row: number) => `${this.customizationRow}:nth-child(${row}) input`
       + '[name^="product[details][customizations][customization_fields]"][name$="[name][1]"]';
     this.customizationTypeSelect = (row: number) => `${this.customizationRow}:nth-child(${row}) select`
       + '[name^="product[details][customizations][customization_fields]"][name$="[type]"]';
-    this.customizationRequiredButton = (row: number, toEnable: number) => `${this.customizationRow}:nth-child(${row}) input`
-      + `[name^="product[details][customizations][customization_fields]"][name$="[required]"][value="${toEnable}"]`;
+    this.customizationRequiredButton = (row: number) => `${this.customizationRow}:nth-child(${row}) input`
+      + '[name^="product[details][customizations][customization_fields]"][name$="[required]"]';
+    this.customizationRequiredButtonStatus = (row: number, toEnable: number) => `${this.customizationRequiredButton(row)}`
+      + `[value="${toEnable}"]`;
     this.deleteCustomizationIcon = (row: number) => `${this.customizationRow}:nth-child(${row}) button`
       + '[name^="product[details][customizations][customization_fields]"][name$="[remove]"]';
     this.deleteCustomizationModal = '#modal-confirm-delete-customization';
@@ -402,11 +410,11 @@ class DetailsTab extends BOBasePage implements BOProductsCreateTabDetailsPageInt
   async addNewCustomization(page: Page, productCustomization: ProductCustomization): Promise<void> {
     await this.waitForSelectorAndClick(page, this.addNewCustomizationButton);
 
-    const nth = await page.locator(this.customizationRow).count();
+    const nth = await this.countCustomizations(page);
 
     await this.setValue(page, this.customizationNameInput(nth), productCustomization.label);
     await this.selectByVisibleText(page, this.customizationTypeSelect(nth), productCustomization.type);
-    await this.setChecked(page, this.customizationRequiredButton(nth, productCustomization.required ? 1 : 0));
+    await this.setChecked(page, this.customizationRequiredButtonStatus(nth, productCustomization.required ? 1 : 0));
   }
 
   /**
@@ -447,6 +455,29 @@ class DetailsTab extends BOBasePage implements BOProductsCreateTabDetailsPageInt
   async deleteCustomizationNth(page: Page, nth: number): Promise<void> {
     await this.waitForSelectorAndClick(page, this.deleteCustomizationIcon(nth));
     await this.waitForSelectorAndClick(page, this.confirmDeleteCustomizationButton);
+  }
+
+  /**
+   * Returns the number of customizations
+   * @param page {Page} Browser tab
+   * @returns {Promise<number>}
+   */
+  async countCustomizations(page: Page): Promise<number> {
+    return page.locator(this.customizationRow).count();
+  }
+
+  /**
+   * Returns the number of customizations
+   * @param page {Page} Browser tab
+   * @returns {Promise<number>}
+   */
+  async getCustomizationNth(page: Page, nth: number): Promise<ProductCustomization> {
+    return {
+      id: parseInt(await page.locator(this.customizationIdentifierInput(nth)).inputValue(), 10),
+      label: await page.locator(this.customizationNameInput(nth)).inputValue(),
+      required: await page.locator(`${this.customizationRequiredButton(nth)}[checked]`).inputValue() === '1',
+      type: await page.locator(this.customizationTypeSelect(nth)).evaluate((select: HTMLSelectElement) => select.value),
+    };
   }
 
   /**
