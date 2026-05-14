@@ -1,5 +1,5 @@
 import {Document, DOMParser, MIME_TYPE} from '@xmldom/xmldom';
-import {XMLValidator} from 'fast-xml-parser';
+import {SyntaxValidator} from 'fast-xml-validator';
 import * as xpath from 'xpath-ts';
 
 const domParser: DOMParser = new DOMParser();
@@ -71,7 +71,7 @@ export default {
    * @return {boolean}
    */
   isValid(xml: string): boolean {
-    const result = XMLValidator.validate(xml, {
+    const result = SyntaxValidator.validate(xml, {
       allowBooleanAttributes: true,
     });
 
