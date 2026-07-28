@@ -365,15 +365,11 @@ class ProductsPage extends BOBasePage implements BOProductsPageInterface {
   }
 
   /**
-   * Resolve the "create product" iframe from its DOM element instead of matching its URL.
-   * `page.frame({url})` resolves against the frames the browser has already registered, so right
-   * after the modal opens it can still return null - firefox hits this far more often than
-   * chromium - and every caller then failed on `expect(createProductFrame).not.toBeNull()`.
-   * Waiting for the iframe element and taking its contentFrame() is deterministic.
+   * Get the create product frame
    * @param page {Page} Browser tab
    * @returns {Promise<Frame>}
    */
-  async getCreateProductFrame(page: Page): Promise<Frame> {
+  private async getProductCreateFrame(page: Page): Promise<Frame> {
     const frameElement = await page.waitForSelector(this.modalCreateProductIframe);
     const createProductFrame: Frame | null = await frameElement.contentFrame();
     expect(createProductFrame).not.toBeNull();
@@ -390,7 +386,7 @@ class ProductsPage extends BOBasePage implements BOProductsPageInterface {
     await this.waitForVisibleSelector(page, `${this.modalCreateProduct} iframe`);
     await this.waitForHiddenSelector(page, this.modalCreateProductLoader);
 
-    const createProductFrame: Frame = await this.getCreateProductFrame(page);
+    const createProductFrame: Frame = await this.getProductCreateFrame(page);
 
     return this.elementVisible(createProductFrame!, this.addNewProductButton, 2000);
   }
@@ -426,7 +422,7 @@ class ProductsPage extends BOBasePage implements BOProductsPageInterface {
     await this.waitForVisibleSelector(page, `${this.modalCreateProduct} iframe`);
     await this.waitForHiddenSelector(page, this.modalCreateProductLoader);
 
-    const createProductFrame: Frame = await this.getCreateProductFrame(page);
+    const createProductFrame: Frame = await this.getProductCreateFrame(page);
 
     return this.getTextContent(createProductFrame!, this.productTypeDescription);
   }
@@ -451,7 +447,7 @@ class ProductsPage extends BOBasePage implements BOProductsPageInterface {
     await this.waitForHiddenSelector(page, this.modalCreateProductLoader);
     await this.waitForVisibleLocator(page.frameLocator(this.modalCreateProductIframe).locator(this.productType(productType)));
 
-    const createProductFrame: Frame = await this.getCreateProductFrame(page);
+    const createProductFrame: Frame = await this.getProductCreateFrame(page);
 
     await createProductFrame!.locator(this.productType(productType)).first().click();
   }
@@ -474,7 +470,7 @@ class ProductsPage extends BOBasePage implements BOProductsPageInterface {
    * @returns {Promise<void>}
    */
   async clickOnAddNewProduct(page: Page): Promise<void> {
-    const createProductFrame: Frame = await this.getCreateProductFrame(page);
+    const createProductFrame: Frame = await this.getProductCreateFrame(page);
 
     await this.waitForSelectorAndClick(createProductFrame!, this.addNewProductButton);
     await this.waitForHiddenSelector(page, this.modalCreateProductIframe, 30000);
