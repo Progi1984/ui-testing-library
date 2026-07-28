@@ -365,6 +365,19 @@ class ProductsPage extends BOBasePage implements BOProductsPageInterface {
   }
 
   /**
+   * Get the create product frame
+   * @param page {Page} Browser tab
+   * @returns {Promise<Frame>}
+   */
+  private async getProductCreateFrame(page: Page): Promise<Frame> {
+    const frameElement = await page.waitForSelector(this.modalCreateProductIframe);
+    const createProductFrame: Frame | null = await frameElement.contentFrame();
+    expect(createProductFrame).not.toBeNull();
+
+    return createProductFrame!;
+  }
+
+  /**
    * Check if new product modal is visible
    * @param page {Page} Browser tab
    * @returns {Promise<boolean>}
@@ -373,8 +386,7 @@ class ProductsPage extends BOBasePage implements BOProductsPageInterface {
     await this.waitForVisibleSelector(page, `${this.modalCreateProduct} iframe`);
     await this.waitForHiddenSelector(page, this.modalCreateProductLoader);
 
-    const createProductFrame: Frame | null = page.frame({url: this.newProductIframeURL});
-    expect(createProductFrame).not.toBeNull();
+    const createProductFrame: Frame = await this.getProductCreateFrame(page);
 
     return this.elementVisible(createProductFrame!, this.addNewProductButton, 2000);
   }
@@ -410,8 +422,7 @@ class ProductsPage extends BOBasePage implements BOProductsPageInterface {
     await this.waitForVisibleSelector(page, `${this.modalCreateProduct} iframe`);
     await this.waitForHiddenSelector(page, this.modalCreateProductLoader);
 
-    const createProductFrame: Frame | null = page.frame({url: this.newProductIframeURL});
-    expect(createProductFrame).not.toBeNull();
+    const createProductFrame: Frame = await this.getProductCreateFrame(page);
 
     return this.getTextContent(createProductFrame!, this.productTypeDescription);
   }
@@ -436,8 +447,7 @@ class ProductsPage extends BOBasePage implements BOProductsPageInterface {
     await this.waitForHiddenSelector(page, this.modalCreateProductLoader);
     await this.waitForVisibleLocator(page.frameLocator(this.modalCreateProductIframe).locator(this.productType(productType)));
 
-    const createProductFrame: Frame | null = page.frame({url: this.newProductIframeURL});
-    expect(createProductFrame).not.toBeNull();
+    const createProductFrame: Frame = await this.getProductCreateFrame(page);
 
     await createProductFrame!.locator(this.productType(productType)).first().click();
   }
@@ -460,8 +470,7 @@ class ProductsPage extends BOBasePage implements BOProductsPageInterface {
    * @returns {Promise<void>}
    */
   async clickOnAddNewProduct(page: Page): Promise<void> {
-    const createProductFrame: Frame | null = page.frame({url: this.newProductIframeURL});
-    expect(createProductFrame).not.toBeNull();
+    const createProductFrame: Frame = await this.getProductCreateFrame(page);
 
     await this.waitForSelectorAndClick(createProductFrame!, this.addNewProductButton);
     await this.waitForHiddenSelector(page, this.modalCreateProductIframe, 30000);
