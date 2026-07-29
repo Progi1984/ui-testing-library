@@ -1,3 +1,4 @@
+import {type DiscountTypeInformation} from '@data/types/discount';
 import {type BODiscountsPageInterface} from '@interfaces/BO/catalog/discountsV2';
 import BOBasePage from '@pages/BO/BOBasePage';
 import {type Page} from '@playwright/test';
@@ -23,6 +24,10 @@ class BODiscountsPage extends BOBasePage implements BODiscountsPageInterface {
   private readonly createDiscountModal: string;
 
   private readonly discountType: (type: string) => string;
+
+  private readonly discountTypeInput: (type: string) => string;
+
+  private readonly discountTypeLabel: (type: string) => string;
 
   private readonly createDiscountButton: string;
 
@@ -84,6 +89,8 @@ class BODiscountsPage extends BOBasePage implements BODiscountsPageInterface {
     this.createDiscountModal = '#createDiscountModal';
     this.discountType = (type: string) => '#discount_type_selector_discount_type_selector div.form-check-radio:'
       + `has(input[value='${type}'])`;
+    this.discountTypeInput = (type: string) => `${this.discountType(type)} input[type="radio"]`;
+    this.discountTypeLabel = (type: string) => `${this.discountType(type)} div.enriched-choice-label`;
     this.createDiscountButton = '#discountTypeSubmit';
 
     // Form selectors
@@ -114,10 +121,33 @@ class BODiscountsPage extends BOBasePage implements BODiscountsPageInterface {
   /**
    * Click on create discount button
    * @param page {Page} Browser tab
+   * @return {Promise<void>}
    */
   async clickOnCreateDiscountButton(page: Page): Promise<void> {
     await page.locator(this.addNewDiscountButton).click();
     await page.waitForSelector(this.createDiscountModal);
+  }
+
+  /**
+   * @param page {Page} Browser tab
+   * @return {Promise<void>}
+   */
+  async hasDiscountType(page: Page, type: string): Promise<boolean> {
+    return await page.locator(this.discountType(type)).count() > 0;
+  }
+
+  /**
+   * @param page {Page} Browser tab
+   * @param type {string}
+   * @returns {Promise<DiscountTypeInformation>}
+   */
+  async getDiscountType(page:Page, type: string): Promise<DiscountTypeInformation> {
+    return {
+      type: await page.locator(this.discountTypeInput(type)).getAttribute('value') ?? '',
+      name: await page.locator(this.discountTypeLabel(type)).textContent() ?? '',
+      core: await page.locator(this.discountTypeInput(type)).getAttribute('badge-label') === 'Core',
+      enabled: true,
+    };
   }
 
   /**

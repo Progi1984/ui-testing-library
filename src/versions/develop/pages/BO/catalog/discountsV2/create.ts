@@ -38,6 +38,8 @@ class BODiscountsCreatePage extends BOBasePage implements BODiscountsCreatePageI
 
   private readonly discountEnabledInput: (value: number) => string;
 
+  private readonly discountHighlightInCartInput: (value: number) => string;
+
   private readonly discountPeriodValidRangeFrom: string;
 
   private readonly discountPeriodValidRangeTo: string;
@@ -143,6 +145,8 @@ class BODiscountsCreatePage extends BOBasePage implements BODiscountsCreatePageI
     this.discountNameInput = (languageId: number) => `#discount_information_names_${languageId}`;
     this.discountDescriptionTextarea = '#discount_information_description';
     this.discountEnabledInput = (value: number) => `input[name="discount[information][active]"][value="${value.toString()}"]`;
+    this.discountHighlightInCartInput = (value: number) => 'input[name="discount[information][highlight_in_cart]"]'
+      + `[value="${value.toString()}"]`;
     // Select period
     this.discountPeriodValidRangeFrom = '#discount_period_valid_date_range_from';
     this.discountPeriodValidRangeTo = '#discount_period_valid_date_range_to';
@@ -206,6 +210,8 @@ class BODiscountsCreatePage extends BOBasePage implements BODiscountsCreatePageI
   async createDiscount(page: Page, discountData: FakerDiscount): Promise<string> {
     await this.setValue(page, this.discountNameInput(dataLanguages.english.id), discountData.name);
     await this.setValue(page, this.discountDescriptionTextarea, discountData.description);
+    await this.setChecked(page, this.discountEnabledInput(discountData.enabled ? 1 : 0), true);
+    await this.setChecked(page, this.discountHighlightInCartInput(discountData.highlightInCart ? 1 : 0), true);
     if (discountData.dateFrom) {
       await this.setValue(page, this.discountPeriodValidRangeFrom, discountData.dateFrom!);
     }
@@ -376,6 +382,8 @@ class BODiscountsCreatePage extends BOBasePage implements BODiscountsCreatePageI
         return page.locator(this.discountDescriptionTextarea).inputValue();
       case 'enabled':
         return (await page.locator(this.discountEnabledInput(1)).isChecked()) ? '1' : '0';
+      case 'highlight_in_cart':
+        return (await page.locator(this.discountHighlightInCartInput(1)).isChecked()) ? '1' : '0';
       case 'minimalAmount':
         return page.locator(this.minimumAmountValueInput).inputValue();
       case 'minimalAmountCurrency':

@@ -102,6 +102,7 @@ export {default as dataContacts} from '@data/demo/contacts';
 export {default as dataCountries} from '@data/demo/countries';
 export {default as dataCurrencies} from '@data/demo/currencies';
 export {default as dataCustomers} from '@data/demo/customers';
+export {default as dataDiscountTypes} from '@data/demo/discountTypes';
 export {default as dataEmployeeRoles} from '@data/demo/employeeRoles';
 export {default as dataEmployees} from '@data/demo/employees';
 export {default as dataFeatures} from '@data/demo/features';

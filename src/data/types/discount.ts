@@ -34,9 +34,18 @@ type DiscountCreator = {
   discountCompatibilityTypes?: number[]
   priority?: number
   freeGift?: FakerProduct | null
+  highlightInCart?: boolean
+  enabled?: boolean
 };
+type DiscountTypeInformation = {
+  type: string
+  name: string
+  core: boolean
+  enabled: boolean
+}
 
 export type {
   DiscountCreator,
   DiscountType,
+  DiscountTypeInformation,
 };
