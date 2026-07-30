@@ -71,6 +71,10 @@ export default class FakerDiscount {
 
   public readonly freeGift: FakerProduct | null;
 
+  public readonly enabled: boolean;
+
+  public readonly highlightInCart: boolean;
+
   /**
    * Constructor for class DiscountData
    * @param discountToCreate {Object} Could be used to force the value of some members
@@ -177,5 +181,11 @@ export default class FakerDiscount {
     // Free gift
     /** @type {FakerProduct|null} The free gift to add on the discount */
     this.freeGift = discountToCreate.freeGift || null;
+
+    /** @type {boolean}  */
+    this.enabled = discountToCreate.enabled || true;
+
+    /** @type {boolean}  */
+    this.highlightInCart = discountToCreate.highlightInCart || false;
   }
 }
